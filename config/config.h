@@ -56,11 +56,52 @@
 #define T_LAUNCH_MULTILOG_1
 #define T_LAUNCH_MULTICONTROL
 
+//Task priorities. Lower number higher priority
+#define SYSTEM_TASK_PRI         2
+#define ADC_TASK_PRI            3
+#define PM_TASK_PRI             3
+#define CRTP_TX_TASK_PRI        2
+#define CRTP_RX_TASK_PRI        2
+#define LOG_TASK_PRI            1
+#define PARAM_TASK_PRI          1
+#define STABILIZER_TASK_PRI     2
+#define RADIOLINK_TASK_PRI      1
+#define ESKYLINK_TASK_PRI       1
+#define UART_TASK_PRI           2
+//Task names
+#define SYSTEM_TASK_NAME        "SYSTEM"
+#define ADC_TASK_NAME           "ADC"
+#define PM_TASK_NAME            "PWRMGNT"
+#define CRTP_TX_TASK_NAME       "CRTP-TX"
+#define CRTP_RX_TASK_NAME       "CRTP-RX"
+#define LOG_TASK_NAME           "LOG"
+#define PARAM_TASK_NAME         "PARAM"
+#define STABILIZER_TASK_NAME    "STABILIZER"
+#define RADIOLINK_TASK_NAME     "RADIOLINK"
+#define ESKYLINK_TASK_NAME      "ESKYLINK"
+#define UART_TASK_NAME          "UART-RX"
+//Task stack sizes
+#define SYSTEM_TASK_STACKSIZE         (2* configMINIMAL_STACK_SIZE)
+#define ADC_TASK_STACKSIZE            configMINIMAL_STACK_SIZE
+#define PM_TASK_STACKSIZE             configMINIMAL_STACK_SIZE
+#define CRTP_TX_TASK_STACKSIZE        configMINIMAL_STACK_SIZE
+#define CRTP_RX_TASK_STACKSIZE        configMINIMAL_STACK_SIZE
+#define LOG_TASK_STACKSIZE            configMINIMAL_STACK_SIZE
+#define PARAM_TASK_STACKSIZE          configMINIMAL_STACK_SIZE
+#define STABILIZER_TASK_STACKSIZE     (2 * configMINIMAL_STACK_SIZE)
+#define RADIOLINK_TASK_STACKSIZE      configMINIMAL_STACK_SIZE
+#define ESKYLINK_TASK_STACKSIZE       configMINIMAL_STACK_SIZE
+#define UART_TASK_STACKSIZE           configMINIMAL_STACK_SIZE
+
 //The radio channel. From 0 to 125
 #define RADIO_CHANEL 10
 #define RADIO_DATARATE RADIO_RATE_250K
 
+//Define to activate automatic shutdown
 #define ACTIVATE_AUTO_SHUTDOWN
+// Shutdown timeout in minutes
+#define SYSTEM_SHUTDOWN_TIMEOUT  5
+
 
 //Debug defines
 //#define BRUSHLESS_MOTORCONTROLLER

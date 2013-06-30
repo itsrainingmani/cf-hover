@@ -134,6 +134,13 @@ int crtpReceivePacket(CRTPPort taskId, CRTPPacket *p);
 int crtpReceivePacketWait(CRTPPort taskId, CRTPPacket *p, int wait);
 
 /**
+ * Get the number of free tx packets in the queue
+ *
+ * @return Number of free packets
+ */
+int crtpGetFreeTxQueuePackets(void);
+
+/**
  * Wait for a packet to arrive for the specified taskID
  *
  * @param[in]  taskId The id of the CRTP task

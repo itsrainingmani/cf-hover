@@ -32,6 +32,7 @@
 #include "task.h"
 #include "semphr.h"
 
+#include "config.h"
 #include "system.h"
 #include "pm.h"
 #include "led.h"
@@ -110,9 +111,8 @@ void pmInit(void)
   GPIO_InitStructure.GPIO_Pin = PM_GPIO_BAT;
   GPIO_Init(PM_GPIO_BAT_PORT, &GPIO_InitStructure);
   
-  
-  xTaskCreate(pmTask, (const signed char * const)"PWRMGNT",
-              configMINIMAL_STACK_SIZE, NULL, /*priority*/3, NULL);
+  xTaskCreate(pmTask, (const signed char * const)PM_TASK_NAME,
+              PM_TASK_STACKSIZE, NULL, PM_TASK_PRI, NULL);
   
   isInit = true;
 }

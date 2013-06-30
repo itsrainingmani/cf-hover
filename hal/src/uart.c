@@ -38,6 +38,7 @@
 #include "semphr.h"
 #include "queue.h"
 
+#include "config.h"
 #include "uart.h"
 #include "crtp.h"
 #include "cfassert.h"
@@ -142,8 +143,8 @@ void uartInit(void)
 
   vSemaphoreCreateBinary(waitUntilSendDone);
 
-  xTaskCreate(uartRxTask, (const signed char * const)"UART-Rx",
-              configMINIMAL_STACK_SIZE, NULL, /*priority*/2, NULL);
+  xTaskCreate(uartRxTask, (const signed char * const)UART_TASK_NAME,
+              UART_TASK_STACKSIZE, NULL, UART_TASK_PRI, NULL);
 
   packetDelivery = xQueueCreate(2, sizeof(CRTPPacket));
   uartDataDelivery = xQueueCreate(40, sizeof(uint8_t));

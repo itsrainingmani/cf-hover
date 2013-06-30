@@ -34,6 +34,9 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
+
+#include "config.h"
+#include "system.h"
 #include "adc.h"
 #include "pm.h"
 #include "nvicconf.h"
@@ -118,7 +121,6 @@ static void adcDecimate(AdcGroup* oversampled, AdcGroup* decimated)
 
 void adcInit(void)
 {
-
   if(isInit)
     return;
 
@@ -209,8 +211,9 @@ void adcInit(void)
 
   adcQueue = xQueueCreate(1, sizeof(AdcGroup*));
 
-  xTaskCreate(adcTask, (const signed char * const)"ADC",
-              configMINIMAL_STACK_SIZE, NULL, /*priority*/3, NULL);
+  xTaskCreate(adcTask, (const signed char * const)ADC_TASK_NAME,
+              ADC_TASK_STACKSIZE, NULL,
+              ADC_TASK_PRI, NULL);
 
   isInit = true;
 }
