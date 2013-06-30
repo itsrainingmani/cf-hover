@@ -37,15 +37,17 @@
 #include <errno.h>
 #include <string.h>
 
-#include "nrf24l01.h"
-#include "crtp.h"
-#include "configblock.h"
-#include "ledseq.h"
-
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
+#include "system.h"
+
+#include "config.h"
+#include "nrf24l01.h"
+#include "crtp.h"
+#include "configblock.h"
+#include "ledseq.h"
 
 /* FIXME: This might be a bit tight range? */
 #define PPM_ZERO 1500
@@ -309,8 +311,8 @@ void eskylinkInit()
   eskylinkInitPairing();
 
     /* Launch the Radio link task */
-  xTaskCreate(eskylinkTask, (const signed char * const)"EskyLink",
-              configMINIMAL_STACK_SIZE, NULL, /*priority*/1, NULL);
+  xTaskCreate(eskylinkTask, (const signed char * const)ESKYLINK_TASK_NAME,
+              ESKYLINK_TASK_STACKSIZE, NULL, ESKYLINK_TASK_PRI, NULL);
 
   isInit = true;
 }

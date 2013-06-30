@@ -39,6 +39,7 @@
 #include "ledseq.h"
 #include "pm.h"
 
+#include "config.h"
 #include "system.h"
 #include "configblock.h"
 #include "worker.h"
@@ -52,7 +53,6 @@
 
 /* Private variable */
 static bool canFly;
-
 static bool isInit;
 
 /* System wide synchronisation */
@@ -64,8 +64,9 @@ static void systemTask(void *arg);
 /* Public functions */
 void systemLaunch(void)
 {
-  xTaskCreate(systemTask, (const signed char * const)"SYSTEM",
-              2*configMINIMAL_STACK_SIZE, NULL, /*Piority*/2, NULL);
+  xTaskCreate(systemTask, (const signed char * const)SYSTEM_TASK_NAME,
+              SYSTEM_TASK_STACKSIZE, NULL,
+              SYSTEM_TASK_PRI, NULL);
 
 }
 
@@ -160,6 +161,7 @@ void systemTask(void *arg)
       ledSet(LED_RED, true);
     }
   }
+  DEBUG_PRINT("Free heap: %d bytes\n", xPortGetFreeHeapSize());
   
   workerLoop();
   
@@ -194,6 +196,12 @@ void systemSetCanFly(bool val)
 bool systemCanFly(void)
 {
   return canFly;
+}
+
+void vApplicationIdleHook( void )
+{
+
+
 }
 
 /*System parameters (mostly for test, should be removed from here) */

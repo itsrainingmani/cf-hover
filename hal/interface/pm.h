@@ -28,6 +28,34 @@
 #define PM_H_
 #include "adc.h"
 
+#ifndef CRITICAL_LOW_VOLTAGE
+  #define PM_BAT_CRITICAL_LOW_VOLTAGE   3.0
+#else
+  #define PM_BAT_CRITICAL_LOW_VOLTAGE   CRITICAL_LOW_VOLTAGE
+#endif
+#ifndef CRITICAL_LOW_TIMEOUT
+  #define PM_BAT_CRITICAL_LOW_TIMEOUT   M2T(1000 * 5) // 5 sec default
+#else
+  #define PM_BAT_CRITICAL_LOW_TIMEOUT   CRITICAL_LOW_VOLTAGE
+#endif
+
+#ifndef LOW_VOLTAGE
+  #define PM_BAT_LOW_VOLTAGE   3.2
+#else
+  #define PM_BAT_LOW_VOLTAGE   LOW_VOLTAGE
+#endif
+#ifndef LOW_TIMEOUT
+  #define PM_BAT_LOW_TIMEOUT   M2T(1000 * 5) // 5 sec default
+#else
+  #define PM_BAT_LOW_TIMEOUT   LOW_TIMEOUT
+#endif
+
+#ifndef SYSTEM_SHUTDOWN_TIMEOUT
+  #define PM_SYSTEM_SHUTDOWN_TIMEOUT    M2T(1000 * 60 * 5) // 5 min default
+#else
+  #define PM_SYSTEM_SHUTDOWN_TIMEOUT    M2T(1000 * 60 * SYSTEM_SHUTDOWN_TIMEOUT)
+#endif
+
 // Power managment pins
 #define PM_GPIO_SYSOFF_PERIF    RCC_APB2Periph_GPIOA
 #define PM_GPIO_SYSOFF_PORT     GPIOA
@@ -54,16 +82,9 @@
 #define PM_GPIO_BAT_PORT        GPIOA
 #define PM_GPIO_BAT             GPIO_Pin_3
 
-#define PM_BAT_CRITICAL_LOW_VOLTAGE   3.0
-#define PM_BAT_CRITICAL_LOW_TIMEOUT   M2T(1000 * 5) // 5 sec
-#define PM_BAT_LOW_VOLTAGE            3.2
-#define PM_BAT_LOW_TIMEOUT            M2T(1000 * 5) // 5 sec
-
 #define PM_BAT_DIVIDER                (float)(3.0)
 #define PM_BAT_ADC_FOR_3_VOLT         (int32_t)(((3.0 / PM_BAT_DIVIDER) / 2.8) * 4096)
 #define PM_BAT_ADC_FOR_1p2_VOLT       (int32_t)(((1.2 / PM_BAT_DIVIDER) / 2.8) * 4096)
-
-#define PM_SYSTEM_SHUTDOWN_TIMEOUT    M2T(1000 * 60 * 5) // 5 min
 
 #define PM_BAT_IIR_SHIFT     8
 /**

@@ -168,8 +168,8 @@ void logInit(void)
   logReset();
   
   //Start the log task
-  xTaskCreate(logTask, (const signed char * const)"log",
-    configMINIMAL_STACK_SIZE, NULL, /*priority*/1, NULL);
+  xTaskCreate(logTask, (const signed char * const)LOG_TASK_NAME,
+              LOG_TASK_STACKSIZE, NULL, LOG_TASK_PRI, NULL);
 
   isInit = true;
 }

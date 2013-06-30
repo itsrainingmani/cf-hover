@@ -27,6 +27,7 @@
 #include <stdbool.h>
 #include <errno.h>
 
+#include "config.h"
 #include "nrf24l01.h"
 #include "crtp.h"
 #include "configblock.h"
@@ -212,8 +213,8 @@ void radiolinkInit()
   radiolinkInitNRF24L01P();
 
     /* Launch the Radio link task */
-  xTaskCreate(radiolinkTask, (const signed char * const)"RadioLink",
-              configMINIMAL_STACK_SIZE, NULL, /*priority*/1, NULL);
+  xTaskCreate(radiolinkTask, (const signed char * const)RADIOLINK_TASK_NAME,
+              RADIOLINK_TASK_STACKSIZE, NULL, RADIOLINK_TASK_PRI, NULL);
 
   isInit = true;
 }

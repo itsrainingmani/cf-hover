@@ -27,6 +27,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+#include "config.h"
 #include "system.h"
 #include "stabilizer.h"
 #include "commander.h"
@@ -113,8 +114,8 @@ void stabilizerInit(void)
   pitchRateDesired = 0;
   yawRateDesired = 0;
 
-  xTaskCreate(stabilizerTask, (const signed char * const)"STABILIZER",
-              2*configMINIMAL_STACK_SIZE, NULL, /*Piority*/2, NULL);
+  xTaskCreate(stabilizerTask, (const signed char * const)STABILIZER_TASK_NAME,
+              STABILIZER_TASK_STACKSIZE, NULL, STABILIZER_TASK_PRI, NULL);
 
   isInit = TRUE;
 }

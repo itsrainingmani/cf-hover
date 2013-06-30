@@ -52,8 +52,7 @@ static struct crtpLinkOperations nopLink = {
 
 static struct crtpLinkOperations *link = &nopLink;
 
-static xQueueHandle  tmpQueue;
-
+static xQueueHandle  txQueue;
 static xQueueHandle  rxQueue;
 
 #define CRTP_NBR_OF_PORTS 16
@@ -71,13 +70,13 @@ void crtpInit(void)
   if(isInit)
     return;
 
-  tmpQueue = xQueueCreate(CRTP_TX_QUEUE_SIZE, sizeof(CRTPPacket));
+  txQueue = xQueueCreate(CRTP_TX_QUEUE_SIZE, sizeof(CRTPPacket));
   rxQueue = xQueueCreate(CRTP_RX_QUEUE_SIZE, sizeof(CRTPPacket));
   /* Start Rx/Tx tasks */
-  xTaskCreate(crtpTxTask, (const signed char * const)"CRTP-Tx",
-              configMINIMAL_STACK_SIZE, NULL, /*priority*/2, NULL);
-  xTaskCreate(crtpRxTask, (const signed char * const)"CRTP-Rx",
-              configMINIMAL_STACK_SIZE, NULL, /*priority*/2, NULL);
+  xTaskCreate(crtpTxTask, (const signed char * const)CRTP_TX_TASK_NAME,
+              CRTP_TX_TASK_STACKSIZE, NULL, CRTP_TX_TASK_PRI, NULL);
+  xTaskCreate(crtpRxTask, (const signed char * const)CRTP_RX_TASK_NAME,
+              CRTP_RX_TASK_STACKSIZE, NULL, CRTP_RX_TASK_PRI, NULL);
   
   isInit = true;
 }
@@ -111,11 +110,17 @@ int crtpReceivePacketBlock(CRTPPort portId, CRTPPacket *p)
 }
 
 
-int crtpReceivePacketWait(CRTPPort portId, CRTPPacket *p, int wait) {
+int crtpReceivePacketWait(CRTPPort portId, CRTPPacket *p, int wait)
+{
   ASSERT(queues[portId]);
   ASSERT(p);
   
   return xQueueReceive(queues[portId], p, M2T(wait));
+}
+
+int crtpGetFreeTxQueuePackets(void)
+{
+  return (CRTP_TX_QUEUE_SIZE - uxQueueMessagesWaiting(txQueue));
 }
 
 void crtpTxTask(void *param)
@@ -124,7 +129,7 @@ void crtpTxTask(void *param)
 
   while (TRUE)
   {
-    if (xQueueReceive(tmpQueue, &p, portMAX_DELAY) == pdTRUE)
+    if (xQueueReceive(txQueue, &p, portMAX_DELAY) == pdTRUE)
     {
       link->sendPacket(&p);
     }
@@ -166,14 +171,14 @@ int crtpSendPacket(CRTPPacket *p)
 {
   ASSERT(p); 
 
-  return xQueueSend(tmpQueue, p, 0);
+  return xQueueSend(txQueue, p, 0);
 }
 
 int crtpSendPacketBlock(CRTPPacket *p)
 {
   ASSERT(p); 
 
-  return xQueueSend(tmpQueue, p, portMAX_DELAY);
+  return xQueueSend(txQueue, p, portMAX_DELAY);
 }
 
 void crtpPacketReveived(CRTPPacket *p)
