@@ -71,8 +71,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 // Experiment with averaging the last 5 values.
 // Used as acc comes at 500 hz but can only be exposed at 100hz.
-PRIVATE Axis3f gyroAVG; // Gyro axis data in deg/s
-PRIVATE Axis3f accAVG;  // Accelerometer axis data in mG
+PRIVATE Axis3f gyroAVG; // gyro values in batches of 5 summed up (divide by 5 to get avg)
+PRIVATE Axis3f accAVG;  // acc values in batches of 5 summed up (divide by 5 to get avg)
 
 
 // Experiment with LPF.
@@ -85,6 +85,10 @@ PRIVATE bool accLPFOn = true;
 PRIVATE bool accAVGOn = false;
 PRIVATE Axis3f accLPF;  // Accelerometer axis data in mG
 PRIVATE float accFac=0.8; // LPF factor
+
+// should do this elsewhere
+Axis3f gyroContainer[5];
+Axis3f accContainer[5];
 
 // EXPERIMENTAL - REMOVE
 LOG_GROUP_START(accExp)
@@ -353,10 +357,10 @@ static void stabilizerTask(void* param)
     }
 
     if (gyroAVGOn) {
-
+        gyroContainer[attitudeCounter % 5] = gyro;
     }
     if (accAVGOn) {
-
+        accContainer[attitudeCounter % 5] = acc;
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -369,6 +373,35 @@ static void stabilizerTask(void* param)
       // 100HZ
       if (++hoverCounter >= HOVER_UPDATE_RATE_DIVIDER) {
           hoverCounter = 0;
+
+          // Compute Average at 100hz
+
+          if (gyroAVGOn) {
+              Axis3f temp;
+              uint_fast8_t j;
+              for (j=0; j<5; ++j){
+                  temp.x += gyroContainer[j].x;
+                  temp.y += gyroContainer[j].y;
+                  temp.z += gyroContainer[j].z;
+              }
+              gyroAVG = temp;
+          }
+
+          if (accAVGOn) {
+              Axis3f temp;
+              uint_fast8_t j;
+              for (j=0; j<5; ++j){
+                  temp.x += accContainer[j].x;
+                  temp.y += accContainer[j].y;
+                  temp.z += accContainer[j].z;
+              }
+              accAVG = temp;
+          }
+
+
+
+
+
 
           // Get hover commands from pilot
           commanderGetHover(&hover, &set_hover, &hoverChange);
