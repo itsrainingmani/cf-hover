@@ -65,8 +65,60 @@
   #define PRIVATE static
 #endif
 
-PRIVATE Axis3f gyro; // Gyro axis data in deg/s
-PRIVATE Axis3f acc;  // Accelerometer axis data in mG
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Experiment with averaging the last 5 values.
+// Used as acc comes at 500 hz but can only be exposed at 100hz.
+PRIVATE Axis3f gyroAVG; // Gyro axis data in deg/s
+PRIVATE Axis3f accAVG;  // Accelerometer axis data in mG
+
+
+// Experiment with LPF.
+// Used as acc comes at 500 hz but can only be exposed at 100hz.
+PRIVATE bool gyroLPFOn = true;
+PRIVATE bool gyroAVGOn = false;
+PRIVATE Axis3f gyroLPF; // Gyro axis data in deg/s
+PRIVATE float gyroFac=0.8; // LPF factor
+PRIVATE bool accLPFOn = true;
+PRIVATE bool accAVGOn = false;
+PRIVATE Axis3f accLPF;  // Accelerometer axis data in mG
+PRIVATE float accFac=0.8; // LPF factor
+
+// EXPERIMENTAL - REMOVE
+LOG_GROUP_START(accExp)
+LOG_ADD(LOG_FLOAT, ax_lpf, &accLPF.x)
+LOG_ADD(LOG_FLOAT, ay_lpf, &accLPF.y)
+LOG_ADD(LOG_FLOAT, az_lpf, &accLPF.z)
+LOG_ADD(LOG_FLOAT, ax_avg, &accAVG.x)
+LOG_ADD(LOG_FLOAT, ay_avg, &accAVG.y)
+LOG_ADD(LOG_FLOAT, az_avg, &accAVG.z)
+LOG_GROUP_STOP(accExp)
+
+// EXPERIMENTAL - REMOVE
+LOG_GROUP_START(gyroExp)
+LOG_ADD(LOG_FLOAT, gx_lpf, &gyroLPF.x)
+LOG_ADD(LOG_FLOAT, gy_lpf, &gyroLPF.y)
+LOG_ADD(LOG_FLOAT, gz_lpf, &gyroLPF.z)
+LOG_ADD(LOG_FLOAT, gx_avg, &gyroAVG.x)
+LOG_ADD(LOG_FLOAT, gy_avg, &gyroAVG.y)
+LOG_ADD(LOG_FLOAT, gz_avg, &gyroAVG.z)
+LOG_GROUP_STOP(gyroExp)
+
+// EXPERIMENTAL - REMOVE
+PARAM_GROUP_START(exp)
+PARAM_ADD(PARAM_FLOAT, aLPF, &accFac)
+PARAM_ADD(PARAM_FLOAT, gLPF, &gyroFac)
+PARAM_ADD(PARAM_UINT8, gLPFOn, &gyroLPFOn)
+PARAM_ADD(PARAM_UINT8, aLPFOn, &accLPFOn)
+PARAM_ADD(PARAM_UINT8, gAVGOn, &gyroLPFOn)
+PARAM_ADD(PARAM_UINT8, aAVGOn, &accLPFOn)
+PARAM_GROUP_STOP(hover)
+//////////////////////////////////////////////////////////////////////////////////////////
+
+
+
 
 
 PRIVATE float eulerRollActual;
@@ -84,6 +136,8 @@ PRIVATE float fusionDt;
 
 
 //
+PRIVATE Axis3f gyro; // Gyro axis data in deg/s
+PRIVATE Axis3f acc;  // Accelerometer axis data in mG
 
 
 
@@ -153,6 +207,8 @@ LOG_ADD(LOG_FLOAT, yaw, &eulerYawActual)
 LOG_ADD(LOG_UINT16, thrust, &actuatorThrust)
 LOG_GROUP_STOP(stabilizer)
 
+
+
 LOG_GROUP_START(motor)
 LOG_ADD(LOG_INT32, m4, &motorPowerM4) 
 LOG_ADD(LOG_INT32, m1, &motorPowerM1) 
@@ -172,6 +228,7 @@ LOG_ADD(LOG_FLOAT, x, &gyro.x)
 LOG_ADD(LOG_FLOAT, y, &gyro.y)
 LOG_ADD(LOG_FLOAT, z, &gyro.z)
 LOG_GROUP_STOP(gyro)
+
 
 
 
@@ -222,6 +279,7 @@ PARAM_ADD(PARAM_UINT16, baseThrust, &hoverBaseThrust)
 PARAM_ADD(PARAM_UINT16, maxThrust, &hoverMaxThrust)
 PARAM_ADD(PARAM_UINT16, minThrust, &hoverMinThrust)
 PARAM_GROUP_STOP(hover)
+
 
 
 static bool isInit;
@@ -283,6 +341,25 @@ static void stabilizerTask(void* param)
     vTaskDelayUntil(&lastWakeTime, F2T(IMU_UPDATE_FREQ));
 
     imu6Read(&gyro, &acc);
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+    if (gyroLPFOn) {
+        LPF(&gyroLPF, &gyro, gyroFac);
+    }
+    if (accLPFOn) {
+        LPF(&accLPF, &acc, accFac);
+    }
+
+    if (gyroAVGOn) {
+
+    }
+    if (accAVGOn) {
+
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////
 
     if (imu6IsCalibrated())
     {

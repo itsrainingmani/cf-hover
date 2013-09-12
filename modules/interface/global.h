@@ -50,6 +50,10 @@ typedef struct {
 static const float DEG2RAD = M_PI/180;
 static const float RAD2DEG = 180/M_PI;
 
+
+
+
+
 #undef max
 #define max(a,b) ((a) > (b) ? (a) : (b))
 #undef min
