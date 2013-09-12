@@ -472,6 +472,15 @@ static void imuAccAlignToGravity(Axis3i16* in, Axis3i16* out)
   out->z = ry.z;
 }
 
+
+
+void LPF(Axis3f* out, const Axis3f* in, const double fac){
+    const double fac_inv = 1-fac;
+    out->x = out->x * fac + in->x*fac_inv;
+    out->y = out->y * fac + in->y*fac_inv;
+    out->z = out->z * fac + in->z*fac_inv;
+}
+
 PARAM_GROUP_START(imu_acc_lpf)
 PARAM_ADD(PARAM_UINT8, factor, &imuAccLpfAttFactor)
 PARAM_GROUP_STOP(imu_acc_lpf)

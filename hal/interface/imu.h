@@ -56,5 +56,7 @@ bool imu6Test(void);
 void imu6Read(Axis3f* gyro, Axis3f* acc);
 bool imu6IsCalibrated(void);
 
+void LPF(Axis3f* out, const Axis3f* in, const double fac);
+
 
 #endif /* IMU_H_ */
